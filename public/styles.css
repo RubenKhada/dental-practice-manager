@@ -1,0 +1,143 @@
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #334155;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --bad: #f87171;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--surface-2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand { font-weight: 800; font-size: 18px; }
+
+.tabs { display: flex; gap: 8px; }
+
+.tab {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.tab.active { background: var(--surface-2); color: var(--text); }
+
+main { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+
+.view.hidden { display: none; }
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--surface-2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.card h3 { margin: 0 0 12px; font-size: 15px; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+input, select {
+  background: var(--bg);
+  border: 1px solid var(--surface-2);
+  color: var(--text);
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); }
+
+.btn {
+  background: var(--accent);
+  color: #06283d;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn:hover { filter: brightness(1.08); }
+
+.msg { margin-left: 10px; font-size: 13px; }
+.msg.ok { color: var(--ok); }
+.msg.err { color: var(--bad); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+}
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--surface-2);
+}
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+td button {
+  background: var(--surface-2);
+  border: none;
+  color: var(--text);
+  padding: 5px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 4px;
+}
+
+/* Badges de estado (6 del workflow) */
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.badge.programada   { background: #1e3a8a; color: #bfdbfe; }
+.badge.confirmada   { background: #065f46; color: #a7f3d0; }
+.badge.reprogramada { background: #92400e; color: #fde68a; }
+.badge.cancelada    { background: #7f1d1d; color: #fecaca; }
+.badge.atendida     { background: #155e75; color: #a5f3fc; }
+.badge.no_asistio   { background: #4b5563; color: #e5e7eb; }

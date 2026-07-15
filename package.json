@@ -1,0 +1,16 @@
+{
+  "name": "dental-practice-manager",
+  "version": "1.0.0",
+  "description": "Sistema de gestión para una odontóloga: pacientes, agenda y recordatorios. Construido en Node + Express + SQLite (node:sqlite nativo).",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/db/seed.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}

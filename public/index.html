@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dental Practice Manager</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🦷 Dental Practice Manager</div>
+    <nav class="tabs">
+      <button class="tab active" data-view="patients">Pacientes</button>
+      <button class="tab" data-view="appointments">Agenda</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ VISTA PACIENTES ============ -->
+    <section id="view-patients" class="view">
+      <div class="row-between">
+        <h2>Pacientes</h2>
+        <input id="search" type="search" placeholder="Buscar por nombre, teléfono o correo…" />
+      </div>
+
+      <form id="patient-form" class="card">
+        <h3>Nuevo paciente</h3>
+        <div class="grid-2">
+          <input name="name" placeholder="Nombre *" required />
+          <input name="phone" placeholder="Teléfono" />
+          <input name="email" placeholder="Correo" />
+          <input name="notes" placeholder="Notas" />
+        </div>
+        <button type="submit" class="btn">Registrar paciente</button>
+        <span id="patient-msg" class="msg"></span>
+      </form>
+
+      <table id="patients-table">
+        <thead>
+          <tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Notas</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- ============ VISTA AGENDA ============ -->
+    <section id="view-appointments" class="view hidden">
+      <div class="row-between">
+        <h2>Agenda de citas</h2>
+      </div>
+
+      <form id="appointment-form" class="card">
+        <h3>Nueva cita</h3>
+        <div class="grid-2">
+          <select name="patient_id" required>
+            <option value="">Selecciona un paciente *</option>
+          </select>
+          <input name="title" placeholder="Motivo de la cita *" required />
+          <input name="starts_at" type="datetime-local" required />
+          <input name="duration_min" type="number" min="5" step="5" placeholder="Duración (min)" value="30" />
+        </div>
+        <button type="submit" class="btn">Agendar cita</button>
+        <span id="appointment-msg" class="msg"></span>
+      </form>
+
+      <table id="appointments-table">
+        <thead>
+          <tr><th>Fecha/Hora</th><th>Paciente</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
