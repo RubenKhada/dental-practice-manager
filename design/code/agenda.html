@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Agenda del Día - Dra. Ana Dental Practice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#0073e0",
+                        "on-background": "#1a1b1f",
+                        "tertiary-fixed": "#72fe88",
+                        "on-tertiary-fixed": "#002107",
+                        "on-secondary-container": "#00706e",
+                        "background": "#faf9fe",
+                        "on-primary-container": "#fefcff",
+                        "surface-container": "#eeedf3",
+                        "on-error": "#ffffff",
+                        "primary": "#005ab3",
+                        "surface-container-low": "#f4f3f8",
+                        "on-secondary-fixed": "#00201f",
+                        "outline": "#717786",
+                        "surface-tint": "#005db8",
+                        "on-surface-variant": "#414754",
+                        "surface": "#faf9fe",
+                        "primary-fixed": "#d6e3ff",
+                        "on-tertiary-fixed-variant": "#00531c",
+                        "secondary-fixed": "#88f4f0",
+                        "on-tertiary-container": "#f7fff2",
+                        "on-surface": "#1a1b1f",
+                        "tertiary-fixed-dim": "#53e16f",
+                        "inverse-surface": "#2f3034",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#aac7ff",
+                        "outline-variant": "#c0c6d6",
+                        "inverse-on-surface": "#f1f0f5",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#6bd7d3",
+                        "on-primary-fixed": "#001b3e",
+                        "surface-bright": "#faf9fe",
+                        "secondary-container": "#88f4f0",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e9e7ed",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e3e2e7",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#00504e",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#008733",
+                        "primary-fixed-dim": "#aac7ff",
+                        "surface-dim": "#dad9df",
+                        "tertiary": "#006b27",
+                        "secondary": "#006a67",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#00468d",
+                        "surface-variant": "#e3e2e7",
+                        "status-amber": "#ff9f0a",
+                        "status-coral": "#ff6961",
+                        "status-green": "#34c759",
+                        "status-mint": "#5ac8c4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "0.875rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack_md": "16px",
+                        "stack_lg": "24px",
+                        "stack_sm": "8px",
+                        "margin_mobile": "16px",
+                        "gutter": "24px",
+                        "max_width": "1024px",
+                        "nav_height": "48px"
+                    },
+                    "fontFamily": {
+                        "h2": ["Inter"],
+                        "h1-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h1": ["Inter"],
+                        "label-md": ["Inter"],
+                        "button": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h2": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "h1-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "h1": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "button": ["15px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "h3": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }]
+                    },
+                    "boxShadow": {
+                        "soft": "0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface-container-low text-on-surface antialiased min-h-screen">
+<!-- Top Navigation -->
+<nav class="fixed top-0 left-0 w-full z-50 bg-surface dark:bg-surface-container-low flex justify-center items-center px-margin_mobile md:px-0 border-b border-outline-variant dark:border-outline h-[48px]">
+<div class="w-full max-w-[1024px] flex justify-between items-center px-4">
+<!-- Brand -->
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dentistry</span>
+<span class="font-h3 text-h3 text-primary dark:text-primary-fixed hidden md:block">Dra. Ana Dental Practice</span>
+</div>
+<!-- Navigation Links -->
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-[10px] pt-3 font-button text-button hover:opacity-80 duration-200" href="#">Agenda</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-button text-button pt-3 pb-[12px]" href="#">Pacientes</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-button text-button pt-3 pb-[12px]" href="#">Nueva cita</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors font-button text-button pt-3 pb-[12px]" href="#">Configuración</a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-full p-1">
+<span class="material-symbols-outlined">search</span>
+</button>
+<div class="w-[28px] h-[28px] rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-sm text-label-sm">
+                    DA
+                </div>
+</div>
+</div>
+</nav>
+<!-- Main Container -->
+<main class="w-full max-w-max_width mx-auto pt-[80px] pb-12 px-4 md:px-gutter">
+<!-- Hero Section -->
+<section class="bg-surface rounded-2xl p-8 mb-8 text-center shadow-soft flex flex-col items-center justify-center">
+<h1 class="font-h1 text-h1 text-on-surface mb-2">Hola, Dra. Ana</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-6">Resumen de hoy · 18 de julio</p>
+<div class="flex gap-4">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-button text-button hover:opacity-90 transition-opacity">
+                    Nueva cita
+                </button>
+<button class="bg-surface border-2 border-primary text-primary px-6 py-2 rounded-full font-button text-button hover:bg-surface-container-low transition-colors">
+                    Ver pacientes
+                </button>
+</div>
+</section>
+<!-- Weekly Strip -->
+<section class="mb-8 flex justify-center items-center">
+<div class="flex items-center gap-4 w-full max-w-[560px]">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex flex-1 justify-between items-center gap-2">
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lun</span>
+<span class="font-button text-button text-on-surface">14</span>
+</div>
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mar</span>
+<span class="font-button text-button text-on-surface">15</span>
+</div>
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Mié</span>
+<span class="font-button text-button text-on-surface">16</span>
+</div>
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Jue</span>
+<span class="font-button text-button text-on-surface">17</span>
+</div>
+<!-- Active Day -->
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-primary text-on-primary shadow-soft">
+<span class="font-label-sm text-label-sm opacity-90">Vie</span>
+<span class="font-button text-button">18</span>
+</div>
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sáb</span>
+<span class="font-button text-button text-on-surface">19</span>
+</div>
+<div class="flex flex-col items-center justify-center w-[48px] h-[64px] rounded-[10px] bg-surface">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Dom</span>
+<span class="font-button text-button text-on-surface">20</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Alertas -->
+<div class="md:col-span-4 flex flex-col gap-4">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-2">ALERTAS</h2>
+<!-- Alert Card 1 -->
+<div class="bg-surface rounded-2xl shadow-soft p-4 border-l-4 border-status-amber flex items-start gap-3">
+<span class="material-symbols-outlined text-status-amber">warning</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface mb-1">Recordatorio pendiente: Marco Ruiz (11:30) sin confirmar</p>
+<p class="font-label-sm text-label-sm text-outline">hace 2 h</p>
+</div>
+</div>
+<!-- Alert Card 2 -->
+<div class="bg-surface rounded-2xl shadow-soft p-4 border-l-4 border-status-coral flex items-start gap-3">
+<span class="material-symbols-outlined text-status-coral">error</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Ana López no asistió a su cita del 15 jul</p>
+</div>
+</div>
+<!-- Alert Card 3 -->
+<div class="bg-surface rounded-2xl shadow-soft p-4 border-l-4 border-primary flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">2 citas mañana requieren recordatorio</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Citas de hoy -->
+<div class="md:col-span-8 flex flex-col gap-4">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-2">CITAS DE HOY</h2>
+<!-- Appointment Card 1 -->
+<div class="bg-surface rounded-2xl shadow-soft p-[14px] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="font-h3 text-h3 text-on-surface">09:00</span>
+<span class="font-label-sm text-label-sm text-outline">45 min</span>
+</div>
+<div class="w-[1px] h-[32px] bg-outline-variant hidden md:block"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Lucía Pérez</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Limpieza</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto justify-end">
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1 rounded-full">
+<div class="w-2 h-2 rounded-full bg-status-green"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Confirmada</span>
+</div>
+<div class="flex gap-2">
+<button class="text-outline hover:text-on-surface transition-colors font-label-sm text-label-sm px-2 py-1">Reprogramar</button>
+<button class="text-outline hover:text-error transition-colors font-label-sm text-label-sm px-2 py-1">Cancelar</button>
+<button class="text-outline hover:text-primary transition-colors font-label-sm text-label-sm px-2 py-1">Confirmar</button>
+</div>
+</div>
+</div>
+<!-- Appointment Card 2 -->
+<div class="bg-surface rounded-2xl shadow-soft p-[14px] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="font-h3 text-h3 text-on-surface">11:30</span>
+<span class="font-label-sm text-label-sm text-outline">30 min</span>
+</div>
+<div class="w-[1px] h-[32px] bg-outline-variant hidden md:block"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Marco Ruiz</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Revisión</span>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1 rounded-full">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Programada</span>
+</div>
+</div>
+<!-- Appointment Card 3 -->
+<div class="bg-surface rounded-2xl shadow-soft p-[14px] flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div class="flex items-center gap-4">
+<div class="flex flex-col">
+<span class="font-h3 text-h3 text-on-surface">16:00</span>
+<span class="font-label-sm text-label-sm text-outline">60 min</span>
+</div>
+<div class="w-[1px] h-[32px] bg-outline-variant hidden md:block"></div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Ana López</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Urgencia</span>
+</div>
+</div>
+<div class="flex items-center gap-2 bg-surface-container px-3 py-1 rounded-full">
+<div class="w-2 h-2 rounded-full bg-status-mint"></div>
+<span class="font-label-sm text-label-sm text-on-surface">Atendida</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component -->
+<footer class="w-full max-w-[1024px] mx-auto flex flex-col md:flex-row justify-between items-center px-margin_mobile py-stack_lg border-t border-outline-variant dark:border-outline bg-surface-container-lowest dark:bg-surface-dim mt-12">
+<div class="font-label-sm text-label-sm text-on-surface-variant dark:text-on-surface-variant mb-4 md:mb-0">
+            © 2024 Dra. Ana Dental Practice. All rights reserved.
+        </div>
+<div class="flex gap-6">
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Privacidad</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant dark:text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Soporte</a>
+</div>
+</footer>
+</body></html>
