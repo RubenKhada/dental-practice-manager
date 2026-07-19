@@ -1,7 +1,7 @@
 # Diseño de interfaz — Dental Practice Manager
 
 > [!info] Crédito
-> El diseño de la interfaz fue realizado por **Taqui** utilizando **Stitch** (herramienta de Google Labs).
+> El diseño de la interfaz fue realizado por **RubenKhada** utilizando **Stitch** (herramienta de Google Labs).
 > Estilo visual inspirado en la estética de Apple, con paleta de la rama de la salud (odontología).
 
 > [!warning] Estado del diseño
