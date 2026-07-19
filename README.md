@@ -42,6 +42,10 @@ Para mantener una primera versión usable y alcanzable, estas funciones se pospo
 
 Actualmente se están definiendo los flujos principales, los requisitos de recordatorios automáticos y las decisiones de arquitectura.
 
+## Diseño de interfaz
+
+El diseño de la interfaz (mockups de Stitch) vive en [`design/`](./design). Incluye las pantallas de Agenda, Pacientes, el modal de Nueva cita y Configuración. Es la **base/referencia** del diseño, no la versión final del frontend (`public/`).
+
 ## Privacidad y datos
 
 > [!IMPORTANT]
@@ -61,6 +65,11 @@ La documentación detallada del proyecto se organizará en [`docs/`](./docs):
 | `reminders.md` | Requisitos de los recordatorios automáticos. |
 | `clinical-record-research.md` | Investigación pendiente del expediente clínico. |
 | `privacy-and-security.md` | Principios de protección de datos y seguridad. |
+
+## Código
+
+- Backend: [`src/`](./src) (Node + Express + SQLite, arquitectura en capas).
+- Frontend: [`public/`](./public) (HTML/JS vanilla; en construcción a partir de [`design/`](./design)).
 
 ## Autor
 
