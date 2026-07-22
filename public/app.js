@@ -93,9 +93,12 @@ document.querySelectorAll('.modal-overlay').forEach((overlay) => {
 });
 
 // ---------- PACIENTES ----------
+let patientsCache = [];
+
 async function loadPatients(search = '') {
   const qs = search ? `?search=${encodeURIComponent(search)}` : '';
   const patients = await api('GET', `/api/patients${qs}`);
+  patientsCache = patients;
   const list = document.getElementById('patients-list');
 
   if (patients.length === 0) {
@@ -115,7 +118,8 @@ async function loadPatients(search = '') {
           </div>
         </div>
         <div class="patient-actions">
-          <button class="btn-link primary" data-schedule="${p.id}" data-name="${esc(p.name)}">Agendar</button>
+          <button class="btn-link primary" data-schedule="${p.id}">Agendar</button>
+          <button class="btn-link" data-edit="${p.id}">Editar</button>
           <button class="btn-link danger" data-del="${p.id}">Eliminar</button>
         </div>
       </article>`
@@ -125,23 +129,40 @@ async function loadPatients(search = '') {
 
 document.getElementById('search').addEventListener('input', (e) => loadPatients(e.target.value));
 
-document.getElementById('btn-new-patient').addEventListener('click', () => {
-  document.getElementById('patient-form').reset();
+function openPatientModal(patient) {
+  const form = document.getElementById('patient-form');
+  form.reset();
+  form.id.value = patient?.id || '';
+  if (patient) {
+    form.name.value = patient.name || '';
+    form.phone.value = patient.phone || '';
+    form.email.value = patient.email || '';
+    form.notes.value = patient.notes || '';
+  }
+  document.getElementById('patient-modal-title').textContent = patient ? 'Editar paciente' : 'Nuevo paciente';
+  document.getElementById('patient-submit').textContent = patient ? 'Guardar cambios' : 'Registrar';
   document.getElementById('patient-msg').textContent = '';
   openModal('modal-patient');
-});
+}
+
+document.getElementById('btn-new-patient').addEventListener('click', () => openPatientModal(null));
 
 document.getElementById('patient-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const msg = document.getElementById('patient-msg');
   const f = e.target;
+  const payload = {
+    name: f.name.value,
+    phone: f.phone.value,
+    email: f.email.value,
+    notes: f.notes.value,
+  };
   try {
-    await api('POST', '/api/patients', {
-      name: f.name.value,
-      phone: f.phone.value,
-      email: f.email.value,
-      notes: f.notes.value,
-    });
+    if (f.id.value) {
+      await api('PUT', `/api/patients/${f.id.value}`, payload);
+    } else {
+      await api('POST', '/api/patients', payload);
+    }
     closeModal('modal-patient');
     loadPatients();
     loadPatientOptions();
@@ -154,12 +175,19 @@ document.getElementById('patient-form').addEventListener('submit', async (e) => 
 document.getElementById('patients-list').addEventListener('click', async (e) => {
   const delId = e.target.dataset.del;
   const scheduleId = e.target.dataset.schedule;
+  const editId = e.target.dataset.edit;
 
   if (delId) {
     if (!confirm('¿Eliminar este paciente? Esta acción no se puede deshacer.')) return;
     await api('DELETE', `/api/patients/${delId}`);
     loadPatients();
     loadPatientOptions();
+    return;
+  }
+
+  if (editId) {
+    const patient = patientsCache.find((p) => String(p.id) === editId);
+    if (patient) openPatientModal(patient);
     return;
   }
 
