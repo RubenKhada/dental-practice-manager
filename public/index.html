@@ -8,69 +8,137 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">🦷 Dental Practice Manager</div>
-    <nav class="tabs">
-      <button class="tab active" data-view="patients">Pacientes</button>
-      <button class="tab" data-view="appointments">Agenda</button>
-    </nav>
+    <div class="topbar-inner">
+      <div class="brand">🦷 Dental Practice Manager</div>
+      <nav class="tabs">
+        <button class="tab active" data-view="agenda">Agenda</button>
+        <button class="tab" data-view="patients">Pacientes</button>
+      </nav>
+      <div class="avatar">DA</div>
+    </div>
   </header>
 
-  <main>
+  <main class="app-main">
+    <!-- ============ VISTA AGENDA ============ -->
+    <section id="view-agenda" class="view">
+      <div class="hero">
+        <h1>Agenda</h1>
+        <p class="hero-subtitle" id="agenda-date"></p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btn-new-appointment">+ Nueva cita</button>
+          <button class="btn btn-secondary" data-view-link="patients">Ver pacientes</button>
+        </div>
+      </div>
+
+      <div class="section-header"><h2 class="section-title">Citas</h2></div>
+      <div id="appointments-list" class="card-list"></div>
+    </section>
+
     <!-- ============ VISTA PACIENTES ============ -->
-    <section id="view-patients" class="view">
-      <div class="row-between">
-        <h2>Pacientes</h2>
+    <section id="view-patients" class="view hidden">
+      <div class="hero">
+        <h1>Pacientes</h1>
+        <p class="hero-subtitle">Tu directorio de pacientes</p>
+        <button class="btn btn-primary" id="btn-new-patient">+ Nuevo paciente</button>
+      </div>
+
+      <div class="search-bar">
         <input id="search" type="search" placeholder="Buscar por nombre, teléfono o correo…" />
       </div>
 
-      <form id="patient-form" class="card">
-        <h3>Nuevo paciente</h3>
-        <div class="grid-2">
-          <input name="name" placeholder="Nombre *" required />
-          <input name="phone" placeholder="Teléfono" />
-          <input name="email" placeholder="Correo" />
-          <input name="notes" placeholder="Notas" />
-        </div>
-        <button type="submit" class="btn">Registrar paciente</button>
-        <span id="patient-msg" class="msg"></span>
-      </form>
-
-      <table id="patients-table">
-        <thead>
-          <tr><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>Notas</th><th></th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- ============ VISTA AGENDA ============ -->
-    <section id="view-appointments" class="view hidden">
-      <div class="row-between">
-        <h2>Agenda de citas</h2>
-      </div>
-
-      <form id="appointment-form" class="card">
-        <h3>Nueva cita</h3>
-        <div class="grid-2">
-          <select name="patient_id" required>
-            <option value="">Selecciona un paciente *</option>
-          </select>
-          <input name="title" placeholder="Motivo de la cita *" required />
-          <input name="starts_at" type="datetime-local" required />
-          <input name="duration_min" type="number" min="5" step="5" placeholder="Duración (min)" value="30" />
-        </div>
-        <button type="submit" class="btn">Agendar cita</button>
-        <span id="appointment-msg" class="msg"></span>
-      </form>
-
-      <table id="appointments-table">
-        <thead>
-          <tr><th>Fecha/Hora</th><th>Paciente</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div id="patients-list" class="card-list"></div>
     </section>
   </main>
+
+  <!-- ============ MODAL: Nuevo paciente ============ -->
+  <div id="modal-patient" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nuevo paciente</h2>
+        <button class="modal-close" data-close-modal="modal-patient" aria-label="Cerrar">✕</button>
+      </div>
+      <form id="patient-form" class="modal-body">
+        <div class="form-field">
+          <label for="patient-name">Nombre *</label>
+          <input id="patient-name" name="name" required placeholder="Nombre completo" />
+        </div>
+        <div class="form-field">
+          <label for="patient-phone">Teléfono</label>
+          <input id="patient-phone" name="phone" placeholder="Teléfono" />
+        </div>
+        <div class="form-field">
+          <label for="patient-email">Correo</label>
+          <input id="patient-email" name="email" type="email" placeholder="Correo" />
+        </div>
+        <div class="form-field">
+          <label for="patient-notes">Notas</label>
+          <input id="patient-notes" name="notes" placeholder="Notas (opcional)" />
+        </div>
+        <p id="patient-msg" class="form-msg"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="modal-patient">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Nueva cita ============ -->
+  <div id="modal-appointment" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nueva cita</h2>
+        <button class="modal-close" data-close-modal="modal-appointment" aria-label="Cerrar">✕</button>
+      </div>
+      <form id="appointment-form" class="modal-body">
+        <div class="form-field">
+          <label for="appointment-patient">Paciente *</label>
+          <select id="appointment-patient" name="patient_id" required>
+            <option value="">Selecciona un paciente</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="appointment-title">Motivo *</label>
+          <input id="appointment-title" name="title" required placeholder="Ej. Limpieza, Revisión, Urgencia" />
+        </div>
+        <div class="form-field">
+          <label for="appointment-starts">Fecha y hora *</label>
+          <input id="appointment-starts" name="starts_at" type="datetime-local" required />
+        </div>
+        <div class="form-field">
+          <label for="appointment-duration">Duración (min)</label>
+          <input id="appointment-duration" name="duration_min" type="number" min="5" step="5" value="30" />
+        </div>
+        <p id="appointment-msg" class="form-msg"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="modal-appointment">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Agendar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Reprogramar cita ============ -->
+  <div id="modal-reschedule" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Reprogramar cita</h2>
+        <button class="modal-close" data-close-modal="modal-reschedule" aria-label="Cerrar">✕</button>
+      </div>
+      <form id="reschedule-form" class="modal-body">
+        <input type="hidden" name="appointment_id" />
+        <div class="form-field">
+          <label for="reschedule-starts">Nueva fecha y hora *</label>
+          <input id="reschedule-starts" name="starts_at" type="datetime-local" required />
+        </div>
+        <p id="reschedule-msg" class="form-msg"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="modal-reschedule">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="/app.js"></script>
 </body>
