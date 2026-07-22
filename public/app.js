@@ -82,6 +82,36 @@ function renderAvatar(p) {
     : `<div class="patient-avatar">${esc(initials(p.name))}</div>`;
 }
 
+// ---------- MASCOTA ----------
+const mascot = {
+  el: document.getElementById('mascot'),
+  bubbleEl: document.getElementById('mascot-bubble'),
+  bubbleTimer: null,
+
+  setMood(mood) {
+    this.el.classList.remove('mood-happy', 'mood-worried', 'mood-sleepy');
+    this.el.classList.add(`mood-${mood}`);
+  },
+
+  celebrate() {
+    this.el.classList.remove('celebrate');
+    void this.el.offsetWidth; // fuerza reflow para poder repetir la animación
+    this.el.classList.add('celebrate');
+  },
+
+  say(message, { mood, celebrate = false } = {}) {
+    if (mood) this.setMood(mood);
+    if (celebrate) this.celebrate();
+    this.bubbleEl.textContent = message;
+    this.bubbleEl.classList.add('visible');
+    clearTimeout(this.bubbleTimer);
+    this.bubbleTimer = setTimeout(() => this.bubbleEl.classList.remove('visible'), 4500);
+  },
+
+  hide() { this.el.classList.add('hidden-by-modal'); },
+  show() { this.el.classList.remove('hidden-by-modal'); },
+};
+
 // ---------- navegación entre vistas ----------
 function showView(view) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
@@ -103,9 +133,11 @@ document.querySelectorAll('[data-view-link]').forEach((el) => {
 // ---------- modales ----------
 function openModal(id) {
   document.getElementById(id).classList.remove('hidden');
+  mascot.hide();
 }
 function closeModal(id) {
   document.getElementById(id).classList.add('hidden');
+  mascot.show();
 }
 document.querySelectorAll('[data-close-modal]').forEach((el) => {
   el.addEventListener('click', () => closeModal(el.dataset.closeModal));
@@ -182,6 +214,7 @@ document.getElementById('patient-form').addEventListener('submit', async (e) => 
     email: f.email.value,
     notes: f.notes.value,
   };
+  const isNew = !f.id.value;
   try {
     if (f.id.value) {
       await api('PUT', `/api/patients/${f.id.value}`, payload);
@@ -191,6 +224,7 @@ document.getElementById('patient-form').addEventListener('submit', async (e) => 
     closeModal('modal-patient');
     loadPatients();
     loadPatientOptions();
+    if (isNew) mascot.say(`¡Bienvenido/a, ${payload.name}! 🎉`, { celebrate: true });
   } catch (err) {
     msg.textContent = err.message;
     msg.className = 'form-msg err';
@@ -433,6 +467,7 @@ document.getElementById('appointment-form').addEventListener('submit', async (e)
     });
     closeModal('modal-appointment');
     loadAppointments();
+    mascot.say('¡Cita agendada! 🎉', { celebrate: true });
   } catch (err) {
     msg.textContent = err.message;
     msg.className = 'form-msg err';
@@ -487,7 +522,7 @@ function renderReminders(appts) {
 
   if (reminders.length === 0) {
     section.classList.add('hidden');
-    return;
+    return reminders;
   }
 
   section.classList.remove('hidden');
@@ -500,6 +535,32 @@ function renderReminders(appts) {
       </div>`
     )
     .join('');
+  return reminders;
+}
+
+let mascotGreeted = false;
+
+// Reacciona a cómo se ve el día: preocupada si hay citas sin confirmar hoy,
+// somnolienta si no hay ninguna cita hoy, feliz en cualquier otro caso.
+// Solo saluda con un mensaje la primera vez que carga la Agenda.
+function reactMascotToAgenda(appts, reminders) {
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  const todayCount = appts.filter(
+    (a) => a.starts_at.slice(0, 10) === todayStr && ACTIVE_STATUSES.includes(a.status)
+  ).length;
+  const hasUnconfirmed = reminders.some((r) => r.type === 'unconfirmed');
+  const mood = hasUnconfirmed ? 'worried' : todayCount === 0 ? 'sleepy' : 'happy';
+  mascot.setMood(mood);
+
+  if (mascotGreeted) return;
+  mascotGreeted = true;
+  if (hasUnconfirmed) {
+    mascot.say(`Buenos días. Tienes ${todayCount} cita(s) hoy y algunas sin confirmar.`);
+  } else if (todayCount === 0) {
+    mascot.say('Buenos días. Hoy no hay citas agendadas.');
+  } else {
+    mascot.say(`¡Buenos días! Hoy tienes ${todayCount} cita${todayCount === 1 ? '' : 's'}.`, { celebrate: true });
+  }
 }
 
 // ---------- franja semanal (calendario no invasivo) ----------
@@ -614,9 +675,10 @@ async function loadAppointments() {
 
   const appts = await api('GET', '/api/appointments');
   appointmentsCache = appts;
-  renderReminders(appts);
+  const reminders = renderReminders(appts);
   renderWeekStrip();
   renderAppointmentsList(appts);
+  reactMascotToAgenda(appts, reminders);
 }
 
 document.getElementById('appointments-list').addEventListener('click', async (e) => {
@@ -625,10 +687,13 @@ document.getElementById('appointments-list').addEventListener('click', async (e)
     if (t.dataset.status) {
       await api('PATCH', `/api/appointments/${t.dataset.id}/status`, { status: t.dataset.status });
       loadAppointments();
+      if (t.dataset.status === 'confirmada') mascot.say('¡Confirmada! ✓', { mood: 'happy', celebrate: true });
+      if (t.dataset.status === 'atendida') mascot.say('Cita marcada como atendida.', { mood: 'happy' });
     } else if (t.dataset.cancel) {
       if (!confirm('¿Cancelar esta cita?')) return;
       await api('POST', `/api/appointments/${t.dataset.cancel}/cancel`);
       loadAppointments();
+      mascot.say('Cita cancelada. Se guardó en el historial.');
     } else if (t.dataset.reschedule) {
       const form = document.getElementById('reschedule-form');
       form.reset();
