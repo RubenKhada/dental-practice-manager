@@ -622,7 +622,9 @@ h1, h2, h3 { font-weight: 700; margin: 0; }
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15));
 }
 .mascot-figure { width: 100%; height: 100%; display: block; }
-.mascot-body { fill: var(--surface-lowest); stroke: var(--primary); stroke-width: 3; }
+.mascot-body { fill: var(--surface-lowest); stroke: var(--primary); stroke-width: 3; stroke-linejoin: round; }
+.mascot-shine { fill: var(--primary-fixed); opacity: 0.4; }
+.mascot-groove { fill: none; stroke: var(--outline-variant); stroke-width: 2; stroke-linecap: round; }
 
 .eye-open, .mouth-worried, .mouth-sleepy { fill: var(--on-surface); }
 .eyebrow, .eye-closed, .mouth-happy {
