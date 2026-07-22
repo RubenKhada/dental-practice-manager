@@ -128,6 +128,25 @@
     </section>
   </main>
 
+  <!-- ============ MODAL: Ficha del paciente (detalle + historial) ============ -->
+  <div id="modal-patient-detail" class="modal-overlay hidden">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="patient-detail-name">Paciente</h2>
+        <button class="modal-close" data-close-modal="modal-patient-detail" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="patient-detail-info" class="patient-detail-info"></div>
+        <div class="section-header"><h2 class="section-title">Historial de citas</h2></div>
+        <div id="patient-detail-appointments" class="card-list"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close-modal="modal-patient-detail">Cerrar</button>
+          <button type="button" class="btn btn-primary" id="patient-detail-new-appointment">+ Nueva cita</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ MODAL: Nuevo paciente ============ -->
   <div id="modal-patient" class="modal-overlay hidden">
     <div class="modal">

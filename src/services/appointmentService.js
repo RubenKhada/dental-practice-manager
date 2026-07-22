@@ -75,6 +75,19 @@ export const appointmentService = {
     return db.prepare('SELECT * FROM appointments WHERE id = ?').get(id);
   },
 
+  // Historial completo (pasado y futuro) de un paciente, más reciente primero.
+  listByPatient(patientId) {
+    return db
+      .prepare(
+        `SELECT a.*, p.name AS patient_name
+         FROM appointments a
+         LEFT JOIN patients p ON p.id = a.patient_id
+         WHERE a.patient_id = ?
+         ORDER BY a.starts_at DESC`
+      )
+      .all(patientId);
+  },
+
   create({ patient_id, title, starts_at, duration_min, status }) {
     // Regla: paciente requerido
     if (!patient_id) {

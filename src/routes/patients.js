@@ -2,6 +2,7 @@
 // Las rutas NO contienen reglas de negocio: solo llaman a patientService.
 import express from 'express';
 import { patientService, ValidationError } from '../services/patientService.js';
+import { appointmentService } from '../services/appointmentService.js';
 
 const router = express.Router();
 
@@ -13,6 +14,11 @@ router.get('/:id', (req, res) => {
   const p = patientService.getById(Number(req.params.id));
   if (!p) return res.status(404).json({ error: 'Paciente no encontrado.' });
   res.json(p);
+});
+
+// Historial de citas del paciente (pasadas y futuras).
+router.get('/:id/appointments', (req, res) => {
+  res.json(appointmentService.listByPatient(Number(req.params.id)));
 });
 
 router.post('/', (req, res) => {

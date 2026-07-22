@@ -45,14 +45,20 @@ function initials(name) {
     .join('');
 }
 
+function toDate(dt) {
+  return new Date(dt.replace(' ', 'T'));
+}
+
 function fmtTime(dt) {
-  const d = new Date(dt.replace(' ', 'T'));
-  return d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+  return toDate(dt).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
 }
 
 function fmtDateHeading(dt) {
-  const d = new Date(dt.replace(' ', 'T'));
-  return d.toLocaleDateString('es-MX', { weekday: 'long', day: '2-digit', month: 'long' });
+  return toDate(dt).toLocaleDateString('es-MX', { weekday: 'long', day: '2-digit', month: 'long' });
+}
+
+function fmtDateShort(dt) {
+  return toDate(dt).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 // 'YYYY-MM-DD HH:mm' (SQL) -> 'YYYY-MM-DDTHH:mm' (input datetime-local)
@@ -120,6 +126,7 @@ async function loadPatients(search = '') {
           </div>
         </div>
         <div class="patient-actions">
+          <button class="btn-link" data-view-patient="${p.id}">Ver</button>
           <button class="btn-link primary" data-schedule="${p.id}">Agendar</button>
           <button class="btn-link" data-edit="${p.id}">Editar</button>
           <button class="btn-link danger" data-del="${p.id}">Eliminar</button>
@@ -178,6 +185,7 @@ document.getElementById('patients-list').addEventListener('click', async (e) => 
   const delId = e.target.dataset.del;
   const scheduleId = e.target.dataset.schedule;
   const editId = e.target.dataset.edit;
+  const viewId = e.target.dataset.viewPatient;
 
   if (delId) {
     if (!confirm('¿Eliminar este paciente? Esta acción no se puede deshacer.')) return;
@@ -195,8 +203,62 @@ document.getElementById('patients-list').addEventListener('click', async (e) => 
 
   if (scheduleId) {
     await openNewAppointmentModal(scheduleId);
+    return;
+  }
+
+  if (viewId) {
+    await openPatientDetailModal(viewId);
   }
 });
+
+// ---------- FICHA DEL PACIENTE (detalle + historial) ----------
+async function openPatientDetailModal(patientId) {
+  const patient = patientsCache.find((p) => String(p.id) === String(patientId))
+    || (await api('GET', `/api/patients/${patientId}`));
+
+  document.getElementById('patient-detail-name').textContent = patient.name;
+  document.getElementById('patient-detail-info').innerHTML = `
+    <span class="patient-detail-line"><strong>Teléfono:</strong> ${esc(patient.phone || '—')}</span>
+    <span class="patient-detail-line"><strong>Correo:</strong> ${esc(patient.email || '—')}</span>
+    ${patient.notes ? `<span class="patient-detail-line"><strong>Notas:</strong> ${esc(patient.notes)}</span>` : ''}
+  `;
+  document.getElementById('patient-detail-new-appointment').onclick = async () => {
+    closeModal('modal-patient-detail');
+    await openNewAppointmentModal(patientId);
+  };
+
+  const appts = await api('GET', `/api/patients/${patientId}/appointments`);
+  const list = document.getElementById('patient-detail-appointments');
+  if (appts.length === 0) {
+    list.innerHTML = '<p class="empty-state">Este paciente aún no tiene citas.</p>';
+  } else {
+    const now = new Date();
+    list.innerHTML = appts
+      .map((a) => {
+        const isPast = toDate(a.starts_at) < now;
+        return `
+        <article class="appointment-card history-card${isPast ? ' is-past' : ''}">
+          <div class="appointment-main">
+            <div class="appointment-when">
+              <span class="appointment-time">${fmtDateShort(a.starts_at)}</span>
+              <span class="appointment-duration">${fmtTime(a.starts_at)}</span>
+            </div>
+            <div class="appointment-divider"></div>
+            <div>
+              <span class="appointment-title">${esc(a.title)}</span>
+            </div>
+          </div>
+          <span class="status-pill">
+            <span class="status-dot ${a.status}"></span>
+            ${esc(STATUS_LABELS[a.status] || a.status)}
+          </span>
+        </article>`;
+      })
+      .join('');
+  }
+
+  openModal('modal-patient-detail');
+}
 
 // ---------- AGENDA ----------
 async function loadPatientOptions() {
