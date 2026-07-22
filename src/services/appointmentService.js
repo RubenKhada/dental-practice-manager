@@ -1,7 +1,7 @@
 // ============================================================
 // Capa de servicios: CITAS (appointments)
 // Implementa las reglas de validación de docs/appointment-workflow.md:
-//   - Evitar cruces (índice único en BD + chequeo en servicio)
+//   - Evitar cruces por solapamiento de horario (considera duration_min)
 //   - Paciente requerido
 //   - Fecha válida (no en el pasado)
 //   - Estado controlado (solo los 6 definidos)
@@ -29,6 +29,34 @@ function getDefaultDuration() {
 // Convierte 'YYYY-MM-DDTHH:mm' (del input datetime-local) a 'YYYY-MM-DD HH:mm'
 function toSqlDateTime(value) {
   return value.replace('T', ' ').slice(0, 16);
+}
+
+function toDate(sql) {
+  return new Date(sql.replace(' ', 'T'));
+}
+
+// Dos citas se cruzan si sus rangos [inicio, inicio+duración) se traslapan.
+// Una cita que empieza justo cuando otra termina NO se considera cruce.
+function rangesOverlap(startA, durA, startB, durB) {
+  const endA = startA.getTime() + durA * 60000;
+  const endB = startB.getTime() + durB * 60000;
+  return startA.getTime() < endB && startB.getTime() < endA;
+}
+
+// Busca, entre las citas activas (no canceladas), alguna que se cruce con
+// el rango [startsSql, startsSql + durationMin). Excluye excludeId al
+// reprogramar, para no chocar contra sí misma.
+function findOverlap(startsSql, durationMin, excludeId) {
+  const active = db
+    .prepare(
+      `SELECT id, starts_at, duration_min FROM appointments
+       WHERE status <> 'cancelada' AND id <> ?`
+    )
+    .all(excludeId ?? -1);
+  const newStart = toDate(startsSql);
+  return active.find((a) =>
+    rangesOverlap(newStart, durationMin, toDate(a.starts_at), a.duration_min)
+  );
 }
 
 export const appointmentService = {
@@ -79,16 +107,10 @@ export const appointmentService = {
       throw new ValidationError(`Estado de cita no válido: ${st}`);
     }
 
-    // Regla: evitar cruces en el mismo instante (el índice único en BD
-    // también lo garantiza, pero damos un mensaje claro desde el servicio).
-    const clash = db
-      .prepare(
-        `SELECT id FROM appointments
-         WHERE starts_at = ? AND status <> 'cancelada'`
-      )
-      .get(startsSql);
+    // Regla: evitar cruces (compara rangos [inicio, inicio+duración), no solo el instante exacto).
+    const clash = findOverlap(startsSql, dur);
     if (clash) {
-      throw new ValidationError('Ese horario acaba de ocuparse. Elige otro.');
+      throw new ValidationError('Ese horario se cruza con otra cita. Elige otro horario.');
     }
 
     const info = db
@@ -115,14 +137,9 @@ export const appointmentService = {
     if (startsSql < nowRow.now) {
       throw new ValidationError('La nueva fecha no puede estar en el pasado.');
     }
-    const clash = db
-      .prepare(
-        `SELECT id FROM appointments
-         WHERE starts_at = ? AND status <> 'cancelada' AND id <> ?`
-      )
-      .get(startsSql, id);
+    const clash = findOverlap(startsSql, appt.duration_min, id);
     if (clash) {
-      throw new ValidationError('Ese horario acaba de ocuparse. Elige otro.');
+      throw new ValidationError('Ese horario se cruza con otra cita. Elige otro horario.');
     }
     db.prepare(
       `UPDATE appointments SET starts_at = ?, status = 'reprogramada' WHERE id = ?`

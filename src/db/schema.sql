@@ -28,9 +28,11 @@ CREATE TABLE IF NOT EXISTS appointments (
   created_at   TEXT DEFAULT (datetime('now'))
 );
 
--- Índice único parcial: evita cruces de horario.
--- Dos citas "activas" (todo excepto cancelada) no pueden ocupar el mismo
--- instante. Si dos pacientes agendan al mismo segundo, la BD rechaza el segundo.
+-- Índice único parcial: red de seguridad contra condiciones de carrera.
+-- El anti-cruce real (que considera duration_min y rangos de horario) vive
+-- en appointmentService.findOverlap(). Este índice solo evita que dos
+-- citas activas queden con el mismo starts_at exacto si dos escrituras
+-- concurrentes pasan la validación del servicio al mismo tiempo.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_no_overlap
   ON appointments (starts_at)
   WHERE status <> 'cancelada';
