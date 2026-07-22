@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS patients (
   phone       TEXT,
   email       TEXT,
   notes       TEXT,
+  photo_path  TEXT,   -- nombre del archivo en data/uploads/ (nunca el binario)
   created_at  TEXT DEFAULT (datetime('now'))
 );
 

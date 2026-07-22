@@ -3,7 +3,14 @@
 // Aquí vive la lógica de negocio. Las rutas solo llaman a estas
 // funciones; no escriben SQL directo. (Separación de responsabilidades)
 // ============================================================
-import { db } from '../db/connection.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import { db, UPLOADS_DIR } from '../db/connection.js';
+
+function removeFile(filePath) {
+  if (!filePath) return;
+  fs.rmSync(path.join(UPLOADS_DIR, filePath), { force: true });
+}
 
 export class ValidationError extends Error {
   constructor(message) {
@@ -73,7 +80,24 @@ export const patientService = {
   remove(id) {
     const existing = patientService.getById(id);
     if (!existing) throw new ValidationError('Paciente no encontrado.');
+    removeFile(existing.photo_path);
     db.prepare('DELETE FROM patients WHERE id = ?').run(id);
     return { id };
+  },
+
+  setPhoto(id, filename) {
+    const existing = patientService.getById(id);
+    if (!existing) throw new ValidationError('Paciente no encontrado.');
+    removeFile(existing.photo_path); // reemplaza la foto anterior, si había
+    db.prepare('UPDATE patients SET photo_path = ? WHERE id = ?').run(filename, id);
+    return patientService.getById(id);
+  },
+
+  removePhoto(id) {
+    const existing = patientService.getById(id);
+    if (!existing) throw new ValidationError('Paciente no encontrado.');
+    removeFile(existing.photo_path);
+    db.prepare('UPDATE patients SET photo_path = NULL WHERE id = ?').run(id);
+    return patientService.getById(id);
   },
 };

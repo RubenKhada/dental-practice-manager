@@ -66,6 +66,22 @@ function toInputDateTime(sql) {
   return sql.replace(' ', 'T').slice(0, 16);
 }
 
+const EMPTY_ICONS = {
+  patients: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 6c-4 0-6 2-9 2-4 0-7-3-7 4 0 8 3 10 4 18 1 6 3 8 5 8s3-4 4-10c1-4 2-6 3-6s2 2 3 6c1 6 2 10 4 10s4-2 5-8c1-8 4-10 4-18 0-7-3-4-7-4-3 0-5-2-9-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+  calendar: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="7" y="10" width="34" height="30" rx="4" stroke="currentColor" stroke-width="2"/><path d="M7 18h34" stroke="currentColor" stroke-width="2"/><path d="M15 6v8M33 6v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="26" r="2" fill="currentColor"/><circle cx="24" cy="26" r="2" fill="currentColor"/><circle cx="32" cy="26" r="2" fill="currentColor"/><circle cx="16" cy="33" r="2" fill="currentColor"/><circle cx="24" cy="33" r="2" fill="currentColor"/></svg>',
+  folder: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14a3 3 0 0 1 3-3h9l4 4h17a3 3 0 0 1 3 3v20a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V14Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+};
+
+function emptyState(icon, text) {
+  return `<div class="empty-state"><div class="empty-state-icon">${EMPTY_ICONS[icon]}</div><p>${esc(text)}</p></div>`;
+}
+
+function renderAvatar(p) {
+  return p.photo_path
+    ? `<img class="patient-avatar" src="/uploads/${p.photo_path}" alt="${esc(p.name)}" />`
+    : `<div class="patient-avatar">${esc(initials(p.name))}</div>`;
+}
+
 // ---------- navegación entre vistas ----------
 function showView(view) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
@@ -110,7 +126,7 @@ async function loadPatients(search = '') {
   const list = document.getElementById('patients-list');
 
   if (patients.length === 0) {
-    list.innerHTML = '<p class="empty-state">No hay pacientes registrados todavía.</p>';
+    list.innerHTML = emptyState('patients', 'No hay pacientes registrados todavía.');
     return;
   }
 
@@ -119,7 +135,7 @@ async function loadPatients(search = '') {
       (p) => `
       <article class="patient-card">
         <div class="patient-info">
-          <div class="patient-avatar">${esc(initials(p.name))}</div>
+          ${renderAvatar(p)}
           <div>
             <span class="patient-name">${esc(p.name)}</span>
             <span class="patient-meta">${esc(p.phone || p.email || 'Sin contacto registrado')}</span>
@@ -214,6 +230,13 @@ document.getElementById('patients-list').addEventListener('click', async (e) => 
 // ---------- FICHA DEL PACIENTE (detalle + historial) ----------
 let currentDetailPatientId = null;
 
+function updatePatientDetailAvatar(patient) {
+  document.getElementById('patient-detail-avatar').innerHTML = patient.photo_path
+    ? `<img src="/uploads/${patient.photo_path}" alt="${esc(patient.name)}" />`
+    : esc(initials(patient.name));
+  document.getElementById('patient-detail-remove-photo').hidden = !patient.photo_path;
+}
+
 async function openPatientDetailModal(patientId) {
   currentDetailPatientId = patientId;
   const patient = patientsCache.find((p) => String(p.id) === String(patientId))
@@ -225,6 +248,33 @@ async function openPatientDetailModal(patientId) {
     <span class="patient-detail-line"><strong>Correo:</strong> ${esc(patient.email || '—')}</span>
     ${patient.notes ? `<span class="patient-detail-line"><strong>Notas:</strong> ${esc(patient.notes)}</span>` : ''}
   `;
+  updatePatientDetailAvatar(patient);
+
+  document.getElementById('patient-detail-remove-photo').onclick = async () => {
+    if (!confirm('¿Quitar la foto de este paciente?')) return;
+    const updated = await api('DELETE', `/api/patients/${patientId}/photo`);
+    updatePatientDetailAvatar(updated);
+    loadPatients();
+  };
+
+  document.getElementById('patient-photo-input').onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('photo', file);
+    try {
+      const res = await fetch(`/api/patients/${patientId}/photo`, { method: 'POST', body: formData });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Ocurrió un error.');
+      updatePatientDetailAvatar(data);
+      loadPatients();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      e.target.value = '';
+    }
+  };
+
   document.getElementById('patient-detail-new-appointment').onclick = async () => {
     closeModal('modal-patient-detail');
     await openNewAppointmentModal(patientId);
@@ -233,7 +283,7 @@ async function openPatientDetailModal(patientId) {
   const appts = await api('GET', `/api/patients/${patientId}/appointments`);
   const list = document.getElementById('patient-detail-appointments');
   if (appts.length === 0) {
-    list.innerHTML = '<p class="empty-state">Este paciente aún no tiene citas.</p>';
+    list.innerHTML = emptyState('calendar', 'Este paciente aún no tiene citas.');
   } else {
     const now = new Date();
     list.innerHTML = appts
@@ -300,7 +350,7 @@ async function loadPatientDocuments(patientId) {
   const docs = await api('GET', `/api/patients/${patientId}/documents`);
   const list = document.getElementById('patient-documents-list');
   if (docs.length === 0) {
-    list.innerHTML = '<p class="empty-state">Sin notas, recetas o radiografías todavía.</p>';
+    list.innerHTML = emptyState('folder', 'Sin notas, recetas o radiografías todavía.');
     return;
   }
   list.innerHTML = docs
@@ -518,8 +568,8 @@ function renderAppointmentsList(appts) {
 
   if (filtered.length === 0) {
     list.innerHTML = selectedDate
-      ? '<p class="empty-state">No hay citas ese día.</p>'
-      : '<p class="empty-state">No hay citas agendadas todavía.</p>';
+      ? emptyState('calendar', 'No hay citas ese día.')
+      : emptyState('calendar', 'No hay citas agendadas todavía.');
     return;
   }
 

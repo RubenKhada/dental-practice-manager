@@ -147,7 +147,18 @@
         <button class="modal-close" data-close-modal="modal-patient-detail" aria-label="Cerrar">✕</button>
       </div>
       <div class="modal-body">
-        <div id="patient-detail-info" class="patient-detail-info"></div>
+        <div class="patient-detail-header">
+          <label class="patient-avatar-upload" id="patient-detail-avatar-wrap" title="Cambiar foto">
+            <div id="patient-detail-avatar"></div>
+            <span class="patient-avatar-overlay">Cambiar foto</span>
+            <input type="file" id="patient-photo-input" accept="image/jpeg,image/png,image/webp" hidden />
+          </label>
+          <div class="patient-detail-header-body">
+            <div id="patient-detail-info" class="patient-detail-info"></div>
+            <button type="button" class="btn-link danger" id="patient-detail-remove-photo" hidden>Quitar foto</button>
+          </div>
+        </div>
+
         <div class="section-header"><h2 class="section-title">Historial de citas</h2></div>
         <div id="patient-detail-appointments" class="card-list"></div>
 

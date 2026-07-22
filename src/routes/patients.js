@@ -5,23 +5,40 @@ import multer from 'multer';
 import path from 'node:path';
 import { patientService, ValidationError } from '../services/patientService.js';
 import { appointmentService } from '../services/appointmentService.js';
-import { documentService, UPLOADS_DIR } from '../services/documentService.js';
+import { documentService } from '../services/documentService.js';
+import { UPLOADS_DIR } from '../db/connection.js';
 
 const router = express.Router();
 
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, UPLOADS_DIR),
+function diskStorageTo(dir) {
+  return multer.diskStorage({
+    destination: (req, file, cb) => cb(null, dir),
     filename: (req, file, cb) => {
       const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
       cb(null, `${unique}${path.extname(file.originalname)}`);
     },
-  }),
+  });
+}
+
+const DOCUMENT_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const upload = multer({
+  storage: diskStorageTo(UPLOADS_DIR),
   limits: { fileSize: 15 * 1024 * 1024 }, // 15 MB
   fileFilter: (req, file, cb) => {
-    if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+    if (!DOCUMENT_MIME_TYPES.includes(file.mimetype)) {
       return cb(new ValidationError('Tipo de archivo no permitido. Usa imagen (JPG/PNG/WEBP) o PDF.'));
+    }
+    cb(null, true);
+  },
+});
+
+const PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const uploadPhoto = multer({
+  storage: diskStorageTo(UPLOADS_DIR),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  fileFilter: (req, file, cb) => {
+    if (!PHOTO_MIME_TYPES.includes(file.mimetype)) {
+      return cb(new ValidationError('La foto debe ser una imagen (JPG, PNG o WEBP).'));
     }
     cb(null, true);
   },
@@ -60,6 +77,16 @@ router.post('/:id/documents', upload.single('file'), (req, res) => {
 router.delete('/:id/documents/:docId', (req, res) => {
   documentService.remove(Number(req.params.docId));
   res.status(204).end();
+});
+
+// Foto de perfil del paciente.
+router.post('/:id/photo', uploadPhoto.single('photo'), (req, res) => {
+  if (!req.file) throw new ValidationError('Selecciona una imagen.');
+  res.json(patientService.setPhoto(Number(req.params.id), req.file.filename));
+});
+
+router.delete('/:id/photo', (req, res) => {
+  res.json(patientService.removePhoto(Number(req.params.id)));
 });
 
 router.post('/', (req, res) => {

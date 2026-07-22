@@ -6,13 +6,8 @@
 // ============================================================
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { db } from '../db/connection.js';
+import { db, UPLOADS_DIR } from '../db/connection.js';
 import { ValidationError } from './patientService.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const UPLOADS_DIR = path.join(__dirname, '../../data/uploads');
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
 const VALID_TYPES = ['nota', 'receta', 'radiografia'];
 
