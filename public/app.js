@@ -316,26 +316,133 @@ function actionsFor(a) {
   return buttons.join('');
 }
 
-async function loadAppointments() {
-  const dateEl = document.getElementById('agenda-date');
-  dateEl.textContent = new Date().toLocaleDateString('es-MX', {
-    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
-  });
+// Calcula, a partir de las citas ya cargadas, qué necesita atención hoy:
+// citas de hoy sin confirmar y citas de mañana (recordatorio próximo).
+// Es puramente informativo: el envío automático de recordatorios aún no
+// está implementado (ver Configuración > Recordatorios).
+function renderReminders(appts) {
+  const section = document.getElementById('reminders-section');
+  const list = document.getElementById('reminders-list');
 
-  const appts = await api('GET', '/api/appointments');
+  const today = new Date();
+  const todayStr = today.toLocaleDateString('sv-SE'); // YYYY-MM-DD, invariante de idioma
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toLocaleDateString('sv-SE');
+
+  const reminders = [];
+  for (const a of appts) {
+    const day = a.starts_at.slice(0, 10);
+    const who = a.patient_name || 'Paciente sin nombre';
+    if (day === todayStr && a.status === 'programada') {
+      reminders.push({
+        type: 'unconfirmed',
+        icon: '⚠️',
+        html: `<strong>${esc(who)}</strong> no ha confirmado su cita de hoy a las ${fmtTime(a.starts_at)}`,
+      });
+    } else if (day === tomorrowStr && ACTIVE_STATUSES.includes(a.status)) {
+      reminders.push({
+        type: 'upcoming',
+        icon: '🔔',
+        html: `Recordar a <strong>${esc(who)}</strong>: cita mañana a las ${fmtTime(a.starts_at)}`,
+      });
+    }
+  }
+
+  if (reminders.length === 0) {
+    section.classList.add('hidden');
+    return;
+  }
+
+  section.classList.remove('hidden');
+  list.innerHTML = reminders
+    .map(
+      (r) => `
+      <div class="reminder-card ${r.type}">
+        <span class="reminder-icon">${r.icon}</span>
+        <span class="reminder-text">${r.html}</span>
+      </div>`
+    )
+    .join('');
+}
+
+// ---------- franja semanal (calendario no invasivo) ----------
+let appointmentsCache = [];
+let weekAnchor = new Date();
+let selectedDate = null; // 'YYYY-MM-DD' o null (ver todas las citas)
+
+function toDateKey(d) {
+  return d.toLocaleDateString('sv-SE'); // YYYY-MM-DD, invariante de idioma
+}
+
+function startOfWeek(d) {
+  const date = new Date(d);
+  const day = date.getDay(); // 0=domingo..6=sábado
+  date.setDate(date.getDate() + ((day === 0 ? -6 : 1) - day)); // retrocede a lunes
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function renderWeekStrip() {
+  const container = document.getElementById('week-days');
+  const monday = startOfWeek(weekAnchor);
+  const todayKey = toDateKey(new Date());
+
+  const cells = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(d.getDate() + i);
+    const key = toDateKey(d);
+    const label = d.toLocaleDateString('es-MX', { weekday: 'short' }).replace('.', '');
+    const isToday = key === todayKey;
+    const isSelected = key === selectedDate;
+    cells.push(`
+      <button type="button" class="day-pill${isSelected ? ' selected' : ''}${isToday && !isSelected ? ' today' : ''}" data-day="${key}">
+        <span class="day-pill-label">${esc(label)}</span>
+        <span class="day-pill-num">${d.getDate()}</span>
+      </button>`);
+  }
+  container.innerHTML = cells.join('');
+}
+
+document.getElementById('week-prev').addEventListener('click', () => {
+  weekAnchor = new Date(weekAnchor);
+  weekAnchor.setDate(weekAnchor.getDate() - 7);
+  renderWeekStrip();
+});
+document.getElementById('week-next').addEventListener('click', () => {
+  weekAnchor = new Date(weekAnchor);
+  weekAnchor.setDate(weekAnchor.getDate() + 7);
+  renderWeekStrip();
+});
+document.getElementById('week-days').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-day]');
+  if (!btn) return;
+  // Clic de nuevo sobre el día ya seleccionado = quitar el filtro (ver todas).
+  selectedDate = selectedDate === btn.dataset.day ? null : btn.dataset.day;
+  renderWeekStrip();
+  renderAppointmentsList(appointmentsCache);
+});
+
+function renderAppointmentsList(appts) {
   const list = document.getElementById('appointments-list');
+  const filtered = selectedDate
+    ? appts.filter((a) => a.starts_at.slice(0, 10) === selectedDate)
+    : appts;
 
-  if (appts.length === 0) {
-    list.innerHTML = '<p class="empty-state">No hay citas agendadas todavía.</p>';
+  if (filtered.length === 0) {
+    list.innerHTML = selectedDate
+      ? '<p class="empty-state">No hay citas ese día.</p>'
+      : '<p class="empty-state">No hay citas agendadas todavía.</p>';
     return;
   }
 
   let lastDay = null;
   const html = [];
-  for (const a of appts) {
+  for (const a of filtered) {
     const day = a.starts_at.slice(0, 10);
     if (day !== lastDay) {
-      html.push(`<div class="date-divider">${esc(fmtDateHeading(a.starts_at))}</div>`);
+      if (!selectedDate) html.push(`<div class="date-divider">${esc(fmtDateHeading(a.starts_at))}</div>`);
       lastDay = day;
     }
     html.push(`
@@ -361,6 +468,19 @@ async function loadAppointments() {
       </article>`);
   }
   list.innerHTML = html.join('');
+}
+
+async function loadAppointments() {
+  const dateEl = document.getElementById('agenda-date');
+  dateEl.textContent = new Date().toLocaleDateString('es-MX', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric',
+  });
+
+  const appts = await api('GET', '/api/appointments');
+  appointmentsCache = appts;
+  renderReminders(appts);
+  renderWeekStrip();
+  renderAppointmentsList(appts);
 }
 
 document.getElementById('appointments-list').addEventListener('click', async (e) => {
