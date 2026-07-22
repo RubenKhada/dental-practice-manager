@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { initSchema } from './db/connection.js';
 import patientsRouter from './routes/patients.js';
 import appointmentsRouter from './routes/appointments.js';
+import settingsRouter from './routes/settings.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 // Inicializa la base de datos (crea tablas si no existen)
@@ -26,6 +27,7 @@ app.use(express.json());
 // API REST (capa de rutas)
 app.use('/api/patients', patientsRouter);
 app.use('/api/appointments', appointmentsRouter);
+app.use('/api/settings', settingsRouter);
 
 // Frontend estático (HTML/JS vanilla en /public)
 app.use(express.static(path.join(__dirname, '../public')));

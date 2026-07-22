@@ -65,8 +65,10 @@ function showView(view) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.view === view));
   document.getElementById('view-agenda').classList.toggle('hidden', view !== 'agenda');
   document.getElementById('view-patients').classList.toggle('hidden', view !== 'patients');
+  document.getElementById('view-settings').classList.toggle('hidden', view !== 'settings');
   if (view === 'agenda') loadAppointments();
   if (view === 'patients') loadPatients();
+  if (view === 'settings') loadSettings();
 }
 
 document.querySelectorAll('.tab').forEach((tab) => {
@@ -332,6 +334,56 @@ document.getElementById('reschedule-form').addEventListener('submit', async (e) 
     });
     closeModal('modal-reschedule');
     loadAppointments();
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.className = 'form-msg err';
+  }
+});
+
+// ---------- CONFIGURACIÓN ----------
+document.querySelectorAll('#reminder-channel-select .pill-option').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#reminder-channel-select .pill-option').forEach((b) => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('setting-reminder-channel').value = btn.dataset.channel;
+  });
+});
+
+async function loadSettings() {
+  const settings = await api('GET', '/api/settings');
+  const f = document.getElementById('settings-form');
+  f.business_name.value = settings.business_name;
+  f.business_phone.value = settings.business_phone;
+  f.business_email.value = settings.business_email;
+  f.opening_time.value = settings.opening_time;
+  f.closing_time.value = settings.closing_time;
+  f.default_duration_min.value = settings.default_duration_min;
+  f.reminder_lead_hours.value = settings.reminder_lead_hours;
+  f.reminder_confirm_enabled.checked = settings.reminder_confirm_enabled === 'true';
+  document.getElementById('setting-reminder-channel').value = settings.reminder_channel;
+  document.querySelectorAll('#reminder-channel-select .pill-option').forEach((b) => {
+    b.classList.toggle('selected', b.dataset.channel === settings.reminder_channel);
+  });
+}
+
+document.getElementById('settings-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('settings-msg');
+  const f = e.target;
+  try {
+    await api('PUT', '/api/settings', {
+      business_name: f.business_name.value,
+      business_phone: f.business_phone.value,
+      business_email: f.business_email.value,
+      opening_time: f.opening_time.value,
+      closing_time: f.closing_time.value,
+      default_duration_min: f.default_duration_min.value,
+      reminder_channel: f.reminder_channel.value,
+      reminder_lead_hours: f.reminder_lead_hours.value,
+      reminder_confirm_enabled: f.reminder_confirm_enabled.checked,
+    });
+    msg.textContent = 'Configuración guardada ✓';
+    msg.className = 'form-msg ok';
   } catch (err) {
     msg.textContent = err.message;
     msg.className = 'form-msg err';

@@ -326,3 +326,95 @@ h1, h2, h3 { font-weight: 700; margin: 0; }
 }
 
 .field-hint { font-size: 12px; color: var(--outline); margin: -2px 0 0; }
+
+/* ---------- Configuración ---------- */
+.settings-list { display: flex; flex-direction: column; gap: 20px; max-width: 640px; margin: 0 auto; }
+.settings-card {
+  background: var(--surface-lowest);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+}
+.settings-card-title { font-size: 17px; margin-bottom: 16px; }
+.settings-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.pill-select { display: flex; gap: 8px; margin-bottom: 16px; }
+.pill-option {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--outline-variant);
+  background: var(--surface-lowest);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+.pill-option:hover { background: var(--surface-low); }
+.pill-option.selected { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid var(--outline-variant);
+  font-size: 15px;
+  cursor: pointer;
+}
+.toggle-switch {
+  appearance: none;
+  width: 40px;
+  height: 22px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-highest);
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s;
+}
+.toggle-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--surface-lowest);
+  box-shadow: var(--shadow-soft);
+  transition: left 0.15s;
+}
+.toggle-switch:checked { background: var(--primary); }
+.toggle-switch:checked::before { left: 20px; }
+
+.settings-actions { display: flex; justify-content: flex-end; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .topbar-inner { padding: 0 12px; gap: 12px; }
+  .brand { font-size: 15px; gap: 6px; }
+  .brand-text { display: none; }
+  .tabs { gap: 2px; }
+  .tab { font-size: 13px; padding: 0 4px; }
+
+  .app-main { padding: 0 12px 32px; }
+  .hero { padding: 20px 16px; margin: 16px 0 24px; }
+  .hero h1 { font-size: 24px; }
+  .hero-subtitle { font-size: 15px; margin-bottom: 16px; }
+  .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+  .hero-actions .btn { width: 100%; }
+
+  .patient-card { flex-direction: column; align-items: stretch; gap: 12px; }
+  .patient-actions { justify-content: flex-end; }
+
+  .appointment-card { flex-direction: column; align-items: stretch; }
+  .appointment-right { justify-content: space-between; width: 100%; }
+
+  .settings-grid-2 { grid-template-columns: 1fr; }
+
+  .modal { max-width: 100%; }
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions .btn { width: 100%; }
+}

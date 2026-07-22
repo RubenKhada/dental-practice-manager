@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, '../../data/dental.db');
+export const DB_PATH = path.join(__dirname, '../../data/dental.db');
 
 // Asegura que exista la carpeta /data
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });

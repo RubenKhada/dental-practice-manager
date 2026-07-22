@@ -9,10 +9,11 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand">🦷 Dental Practice Manager</div>
+      <div class="brand"><span class="brand-icon">🦷</span><span class="brand-text">Dental Practice Manager</span></div>
       <nav class="tabs">
         <button class="tab active" data-view="agenda">Agenda</button>
         <button class="tab" data-view="patients">Pacientes</button>
+        <button class="tab" data-view="settings">Configuración</button>
       </nav>
       <div class="avatar">DA</div>
     </div>
@@ -47,6 +48,83 @@
       </div>
 
       <div id="patients-list" class="card-list"></div>
+    </section>
+
+    <!-- ============ VISTA CONFIGURACIÓN ============ -->
+    <section id="view-settings" class="view hidden">
+      <div class="hero">
+        <h1>Configuración</h1>
+        <p class="hero-subtitle">Ajusta tu consultorio y la agenda</p>
+      </div>
+
+      <form id="settings-form" class="settings-list">
+        <section class="settings-card">
+          <h2 class="settings-card-title">Perfil del consultorio</h2>
+          <div class="form-field">
+            <label for="setting-business-name">Nombre del consultorio</label>
+            <input id="setting-business-name" name="business_name" placeholder="Ej. Consultorio Dra. Ana" />
+          </div>
+          <div class="settings-grid-2">
+            <div class="form-field">
+              <label for="setting-business-phone">Teléfono</label>
+              <input id="setting-business-phone" name="business_phone" type="tel" placeholder="+52 55 1234 5678" />
+            </div>
+            <div class="form-field">
+              <label for="setting-business-email">Correo de contacto</label>
+              <input id="setting-business-email" name="business_email" type="email" placeholder="contacto@consultorio.com" />
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-card">
+          <h2 class="settings-card-title">Horario de atención</h2>
+          <div class="settings-grid-2">
+            <div class="form-field">
+              <label for="setting-opening">Hora de apertura</label>
+              <input id="setting-opening" name="opening_time" type="time" />
+            </div>
+            <div class="form-field">
+              <label for="setting-closing">Hora de cierre</label>
+              <input id="setting-closing" name="closing_time" type="time" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="setting-duration">Duración de cita por defecto (min)</label>
+            <input id="setting-duration" name="default_duration_min" type="number" min="5" step="5" />
+          </div>
+          <p class="field-hint">Por ahora estos valores son informativos: el sistema todavía no rechaza citas fuera de este horario.</p>
+        </section>
+
+        <section class="settings-card">
+          <h2 class="settings-card-title">Recordatorios automáticos</h2>
+          <div class="pill-select" id="reminder-channel-select">
+            <button type="button" class="pill-option" data-channel="whatsapp">WhatsApp</button>
+            <button type="button" class="pill-option" data-channel="correo">Correo</button>
+            <button type="button" class="pill-option" data-channel="sms">SMS</button>
+          </div>
+          <input type="hidden" name="reminder_channel" id="setting-reminder-channel" />
+          <div class="form-field">
+            <label for="setting-lead-hours">Anticipación (horas antes de la cita)</label>
+            <input id="setting-lead-hours" name="reminder_lead_hours" type="number" min="1" step="1" />
+          </div>
+          <label class="toggle-row">
+            <span>Enviar recordatorio de confirmación</span>
+            <input type="checkbox" name="reminder_confirm_enabled" id="setting-reminder-enabled" class="toggle-switch" />
+          </label>
+          <p class="field-hint">El canal se guarda como preferencia; el envío automático de recordatorios aún no está implementado.</p>
+        </section>
+
+        <section class="settings-card">
+          <h2 class="settings-card-title">Datos y respaldo</h2>
+          <p class="field-hint" style="margin-bottom: 12px;">Tus datos se guardan localmente en tu computadora, en un solo archivo.</p>
+          <a class="btn btn-secondary" href="/api/settings/backup" download>Exportar base de datos</a>
+        </section>
+
+        <p id="settings-msg" class="form-msg"></p>
+        <div class="settings-actions">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        </div>
+      </form>
     </section>
   </main>
 
