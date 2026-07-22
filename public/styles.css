@@ -611,94 +611,6 @@ h1, h2, h3 { font-weight: 700; margin: 0; }
 
 .settings-actions { display: flex; justify-content: flex-end; }
 
-/* ---------- Mascota ---------- */
-.mascot {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 84px;
-  height: 84px;
-  z-index: 40;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15));
-}
-.mascot-figure { width: 100%; height: 100%; display: block; }
-.mascot-body { fill: var(--surface-lowest); stroke: var(--primary); stroke-width: 3; stroke-linejoin: round; }
-.mascot-shine { fill: var(--primary-fixed); opacity: 0.4; }
-.mascot-groove { fill: none; stroke: var(--outline-variant); stroke-width: 2; stroke-linecap: round; }
-
-.eye-open, .mouth-worried, .mouth-sleepy { fill: var(--on-surface); }
-.eyebrow, .eye-closed, .mouth-happy {
-  fill: none;
-  stroke: var(--on-surface);
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-.mascot-zzz { fill: var(--outline); font-size: 15px; font-weight: 700; }
-
-/* Por estado de ánimo: solo se muestra la parte correspondiente. */
-.eye-open, .eyebrow, .eye-closed,
-.mouth-happy, .mouth-worried, .mouth-sleepy,
-.mascot-zzz { display: none; }
-
-.mascot.mood-happy .eye-open,
-.mascot.mood-happy .mouth-happy { display: block; }
-
-.mascot.mood-worried .eye-open,
-.mascot.mood-worried .eyebrow,
-.mascot.mood-worried .mouth-worried { display: block; }
-
-.mascot.mood-sleepy .eye-closed,
-.mascot.mood-sleepy .mouth-sleepy,
-.mascot.mood-sleepy .mascot-zzz { display: block; }
-
-.mascot-bubble {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  margin-bottom: 12px;
-  max-width: 200px;
-  width: max-content;
-  background: var(--surface-lowest);
-  color: var(--on-surface);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-modal);
-  opacity: 0;
-  transform: translateY(6px) scale(0.95);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-}
-.mascot-bubble::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  right: 26px;
-  border: 6px solid transparent;
-  border-top-color: var(--surface-lowest);
-}
-.mascot-bubble.visible { opacity: 1; transform: translateY(0) scale(1); }
-
-.mascot.hidden-by-modal { visibility: hidden; }
-
-@media (prefers-reduced-motion: no-preference) {
-  @keyframes mascot-breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.045); }
-  }
-  .mascot-figure { animation: mascot-breathe 3.2s ease-in-out infinite; }
-
-  @keyframes mascot-bounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    30% { transform: translateY(-10px) scale(1.06); }
-    55% { transform: translateY(0) scale(0.96); }
-    75% { transform: translateY(-4px) scale(1.02); }
-  }
-  .mascot.celebrate .mascot-figure { animation: mascot-bounce 0.7s ease; }
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {
   .topbar-inner { padding: 0 12px; gap: 12px; }
@@ -725,7 +637,4 @@ h1, h2, h3 { font-weight: 700; margin: 0; }
   .modal { max-width: 100%; }
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions .btn { width: 100%; }
-
-  .mascot { width: 60px; height: 60px; right: 12px; bottom: 12px; }
-  .mascot-bubble { max-width: 150px; font-size: 12px; }
 }
