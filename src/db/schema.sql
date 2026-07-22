@@ -44,3 +44,18 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 INSERT OR IGNORE INTO settings (key, value) VALUES ('default_duration_min', '30');
 INSERT OR IGNORE INTO settings (key, value) VALUES ('business_timezone', 'America/Mexico_City');
+
+-- Expediente clínico: notas, recetas y radiografías por paciente.
+-- El archivo (imagen/PDF) NO se guarda aquí: vive en data/uploads/ y esta
+-- fila solo referencia su nombre. Ver documentService.js.
+CREATE TABLE IF NOT EXISTS documents (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  patient_id    INTEGER NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+  type          TEXT NOT NULL CHECK (type IN ('nota', 'receta', 'radiografia')),
+  note_text     TEXT,
+  file_path     TEXT,
+  original_name TEXT,
+  mime_type     TEXT,
+  created_at    TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_documents_patient ON documents (patient_id);

@@ -150,6 +150,31 @@
         <div id="patient-detail-info" class="patient-detail-info"></div>
         <div class="section-header"><h2 class="section-title">Historial de citas</h2></div>
         <div id="patient-detail-appointments" class="card-list"></div>
+
+        <div class="section-header"><h2 class="section-title">Expediente clínico</h2></div>
+        <div id="patient-documents-list" class="card-list"></div>
+
+        <form id="document-form" class="document-form">
+          <div class="pill-select" id="document-type-select">
+            <button type="button" class="pill-option selected" data-doc-type="nota">Nota</button>
+            <button type="button" class="pill-option" data-doc-type="receta">Receta</button>
+            <button type="button" class="pill-option" data-doc-type="radiografia">Radiografía</button>
+          </div>
+          <input type="hidden" name="type" value="nota" />
+          <div class="form-field">
+            <label for="document-note">Nota</label>
+            <textarea id="document-note" name="note_text" rows="2" placeholder="Diagnóstico, indicación o nota clínica…"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="document-file">Adjuntar archivo (imagen o PDF, opcional)</label>
+            <input id="document-file" name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" />
+          </div>
+          <p id="document-msg" class="form-msg"></p>
+          <div class="settings-actions">
+            <button type="submit" class="btn btn-primary">Agregar al expediente</button>
+          </div>
+        </form>
+
         <div class="modal-actions">
           <button type="button" class="btn btn-ghost" data-close-modal="modal-patient-detail">Cerrar</button>
           <button type="button" class="btn btn-primary" id="patient-detail-new-appointment">+ Nueva cita</button>

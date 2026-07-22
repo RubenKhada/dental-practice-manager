@@ -212,7 +212,10 @@ document.getElementById('patients-list').addEventListener('click', async (e) => 
 });
 
 // ---------- FICHA DEL PACIENTE (detalle + historial) ----------
+let currentDetailPatientId = null;
+
 async function openPatientDetailModal(patientId) {
+  currentDetailPatientId = patientId;
   const patient = patientsCache.find((p) => String(p.id) === String(patientId))
     || (await api('GET', `/api/patients/${patientId}`));
 
@@ -257,8 +260,91 @@ async function openPatientDetailModal(patientId) {
       .join('');
   }
 
+  resetDocumentForm();
+  await loadPatientDocuments(patientId);
+
   openModal('modal-patient-detail');
 }
+
+// ---------- EXPEDIENTE CLÍNICO (notas, recetas, radiografías) ----------
+const DOC_TYPE_LABELS = { nota: 'Nota', receta: 'Receta', radiografia: 'Radiografía' };
+
+document.querySelectorAll('#document-type-select .pill-option').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#document-type-select .pill-option').forEach((b) => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('document-form').type.value = btn.dataset.docType;
+  });
+});
+
+function resetDocumentForm() {
+  const form = document.getElementById('document-form');
+  form.reset();
+  form.type.value = 'nota';
+  document.querySelectorAll('#document-type-select .pill-option').forEach((b) => {
+    b.classList.toggle('selected', b.dataset.docType === 'nota');
+  });
+  document.getElementById('document-msg').textContent = '';
+}
+
+function renderDocumentFile(doc) {
+  if (!doc.file_path) return '';
+  const url = `/uploads/${doc.file_path}`;
+  if (doc.mime_type?.startsWith('image/')) {
+    return `<a href="${url}" target="_blank"><img class="document-thumb" src="${url}" alt="${esc(doc.original_name || 'adjunto')}" /></a>`;
+  }
+  return `<a class="document-file-link" href="${url}" target="_blank">📄 ${esc(doc.original_name || 'Ver archivo')}</a>`;
+}
+
+async function loadPatientDocuments(patientId) {
+  const docs = await api('GET', `/api/patients/${patientId}/documents`);
+  const list = document.getElementById('patient-documents-list');
+  if (docs.length === 0) {
+    list.innerHTML = '<p class="empty-state">Sin notas, recetas o radiografías todavía.</p>';
+    return;
+  }
+  list.innerHTML = docs
+    .map(
+      (doc) => `
+      <article class="document-card">
+        <div class="document-card-header">
+          <span class="doc-type-badge ${doc.type}">${esc(DOC_TYPE_LABELS[doc.type] || doc.type)}</span>
+          <span class="document-date">${fmtDateShort(doc.created_at)}</span>
+          <button class="btn-link danger" data-del-doc="${doc.id}">Eliminar</button>
+        </div>
+        ${doc.note_text ? `<p class="document-note">${esc(doc.note_text)}</p>` : ''}
+        ${renderDocumentFile(doc)}
+      </article>`
+    )
+    .join('');
+}
+
+document.getElementById('document-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('document-msg');
+  const formData = new FormData(e.target);
+  try {
+    const res = await fetch(`/api/patients/${currentDetailPatientId}/documents`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Ocurrió un error.');
+    resetDocumentForm();
+    await loadPatientDocuments(currentDetailPatientId);
+  } catch (err) {
+    msg.textContent = err.message;
+    msg.className = 'form-msg err';
+  }
+});
+
+document.getElementById('patient-documents-list').addEventListener('click', async (e) => {
+  const docId = e.target.dataset.delDoc;
+  if (!docId) return;
+  if (!confirm('¿Eliminar este documento del expediente? Esta acción no se puede deshacer.')) return;
+  await api('DELETE', `/api/patients/${currentDetailPatientId}/documents/${docId}`);
+  await loadPatientDocuments(currentDetailPatientId);
+});
 
 // ---------- AGENDA ----------
 async function loadPatientOptions() {
